@@ -23,6 +23,8 @@ test("create profile form", async ({ page }) => {
 
   await expect(descriptionLocator).toBeVisible();
 
+  // Checkbox
+
   const interestsContainer = formLocator
     .locator("div")
     .filter({
@@ -116,6 +118,70 @@ test("create profile form", async ({ page }) => {
 
     await expect(item).toBeChecked();
   }
+
+  // Radio Button
+
+  const notificationContainer = formLocator
+    .locator("div")
+    .filter({
+      has: page.getByRole("radio"),
+    })
+    .filter({
+      has: page.getByText("Notify me about..."),
+    });
+
+  await expect(notificationContainer).toBeVisible();
+
+  const radioOpts = notificationContainer.getByRole("radio");
+
+  await expect(radioOpts).toHaveCount(3);
+
+  const option1 = radioOpts.first();
+
+  const option2 = radioOpts.nth(1);
+
+  const option3 = radioOpts.last();
+
+  await option1.click();
+
+  await expect(option1).toBeChecked();
+  await expect(option2).not.toBeChecked();
+  await expect(option3).not.toBeChecked();
+
+  await option2.click();
+
+  await expect(option1).not.toBeChecked();
+  await expect(option2).toBeChecked();
+  await expect(option3).not.toBeChecked();
+
+  await option3.click();
+
+  await expect(option1).not.toBeChecked();
+  await expect(option2).not.toBeChecked();
+  await expect(option3).toBeChecked();
+
+  // Dropdown Menu
+
+  const dropdownContainer = formLocator.locator(page.getByRole("combobox")); // ≠combobox, = div parent of combobox
+
+  await expect(dropdownContainer).toBeVisible();
+
+  const initialMsg = formLocator.locator("div").locator("span").filter({
+    hasText: "Select a verified email to display",
+  });
+
+  await expect(initialMsg).toHaveText("Select a verified email to display");
+
+  await dropdownContainer.click();
+
+  const dropdownMenu = page.locator("select");
+
+  console.log(dropdownMenu);
+
+  await expect(dropdownContainer).toHaveText("India");
+  // await expect(dropdownMenu).toHaveText("Select a verified email to display"); //--- Not Working
+
+  // Click Submit button
 
   const submitBtn = formLocator.getByRole("button", {
     name: "Submit",
